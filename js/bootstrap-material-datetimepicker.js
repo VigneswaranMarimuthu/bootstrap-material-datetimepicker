@@ -40,7 +40,7 @@
          {
             if (typeof ($.data(this, pluginDataName)[options]) === 'function')
             {
-               $.data(this, pluginDataName)[options](p);
+               return $.data(this, pluginDataName)[options](p);
             }
             if (options === 'destroy')
             {
@@ -723,6 +723,23 @@
 
                  return _calendar;
               },
+              isDisabled: function (date) {
+                return (this.isBeforeMaxDate(moment(date), false, false) === false
+                        || this.isAfterMinDate(moment(date), false, false) === false
+                        || this.params.disabledDays.indexOf(date.isoWeekday()) !== -1);
+              },
+              getSelectableDate: function () {
+                var date = this.minDate;
+                if (typeof (date) === 'undefined' || date === null) {
+                    date = moment();
+                }
+
+                while (this.isDisabled(date)) {
+                    date.add(1, 'days');
+                }
+
+                return date;
+              },
               constructHTMLCalendar: function (date, calendar)
               {
                  var _template = "";
@@ -744,9 +761,7 @@
                     _template += '<td data-date="' + moment(calendar.days[i]).locale(this.params.lang).format("D") + '">';
                     if (calendar.days[i] != 0)
                     {
-                        if (this.isBeforeMaxDate(moment(calendar.days[i]), false, false) === false
-                            || this.isAfterMinDate(moment(calendar.days[i]), false, false) === false
-                            || this.params.disabledDays.indexOf(calendar.days[i].isoWeekday()) !== -1)
+                        if (this.isDisabled(calendar.days[i]))
                         {
                             _template += '<span class="dtp-select-day">' + moment(calendar.days[i]).locale(this.params.lang).format("DD") + '</span>';
                         } else
