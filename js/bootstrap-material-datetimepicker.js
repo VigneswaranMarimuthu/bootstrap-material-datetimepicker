@@ -40,7 +40,7 @@
          {
             if (typeof ($.data(this, pluginDataName)[options]) === 'function')
             {
-               return $.data(this, pluginDataName)[options](p);
+               $.data(this, pluginDataName)[options](p);
             }
             if (options === 'destroy')
             {
