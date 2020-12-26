@@ -29,26 +29,24 @@
       this.init();
    }
 
-   $.fn[pluginName] = function (options, p)
-   {
-      this.each(function ()
-      {
-         if (!$.data(this, pluginDataName))
-         {
+   $.fn[pluginName] = function (options, p) {
+    if (options === 'getSelectableDate') {
+      return $.data(this.get(0), pluginDataName)[options](p);
+    } else {
+        this.each(function () {
+         if (!$.data(this, pluginDataName)) {
             $.data(this, pluginDataName, new Plugin(this, options));
-         } else
-         {
-            if (typeof ($.data(this, pluginDataName)[options]) === 'function')
-            {
+         } else {
+            if (typeof ($.data(this, pluginDataName)[options]) === 'function') {
                $.data(this, pluginDataName)[options](p);
             }
-            if (options === 'destroy')
-            {
+            if (options === 'destroy') {
                delete $.data(this, pluginDataName);
             }
          }
       });
       return this;
+    }
    };
 
    Plugin.prototype =
