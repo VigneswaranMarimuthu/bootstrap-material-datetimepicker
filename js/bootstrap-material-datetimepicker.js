@@ -189,11 +189,11 @@
 
                  if (!this.isAfterMinDate(this.currentDate))
                  {
-                    this.currentDate = moment(this.minDate);
+                    this.currentDate = this.getSelectableDate(moment(this.minDate));
                  }
                  if (!this.isBeforeMaxDate(this.currentDate))
                  {
-                    this.currentDate = moment(this.maxDate);
+                    this.currentDate = this.getSelectableDate(moment(this.maxDate), true);
                  }
               },
               initTemplate: function ()
@@ -726,14 +726,18 @@
                         || this.isAfterMinDate(moment(date), false, false) === false
                         || this.params.disabledDays.indexOf(date.isoWeekday()) !== -1);
               },
-              getSelectableDate: function () {
-                var date = this.minDate;
-                if (typeof (date) === 'undefined' || date === null) {
+              // Get selectable date in the month
+              // of the passed month or current month
+              getSelectableDate: function (date, last) {
+                var modifier = (last === true) ? -1 : 1;
+
+                if (!date || !date.isValid()) {
                     date = moment();
+                    modifier = 1;
                 }
 
                 while (this.isDisabled(date)) {
-                    date.add(1, 'days');
+                    date.add(modifier, 'days');
                 }
 
                 return date;
@@ -1017,29 +1021,32 @@
                     this.hide();
                  }
               },
+              _handleMonthOrYearChange: function () {
+                if (this.isDisabled(this.currentDate)) {
+                    this.currentDate = this.getSelectableDate(this.currentDate.startOf('month'));
+                }
+                 this.initDate(this.currentDate);
+                  this._closeYearPicker();
+              },
               _onMonthBeforeClick: function ()
               {
                  this.currentDate.subtract(1, 'months');
-                 this.initDate(this.currentDate);
-                  this._closeYearPicker();
+                 this._handleMonthOrYearChange();
               },
               _onMonthAfterClick: function ()
               {
                  this.currentDate.add(1, 'months');
-                 this.initDate(this.currentDate);
-                  this._closeYearPicker();
+                 this._handleMonthOrYearChange();
               },
               _onYearBeforeClick: function ()
               {
                  this.currentDate.subtract(1, 'years');
-                 this.initDate(this.currentDate);
-                  this._closeYearPicker();
+                 this._handleMonthOrYearChange();
               },
               _onYearAfterClick: function ()
               {
                  this.currentDate.add(1, 'years');
-                 this.initDate(this.currentDate);
-                  this._closeYearPicker();
+                 this._handleMonthOrYearChange();
               },
                refreshYearItems:function () {
                   var curYear=this.currentDate.year(),midYear=this.midYear;
